@@ -64,6 +64,14 @@ contract Certificate {
     
     // Check and decrement TTL. Mark invalid for expired TTLs
     function check_ttl() {
+        for(uint i = 0; i < nodeAddresses.length; i++) {
+            if(connectedNodes[nodeAddresses[i]].valid == true) {
+                connectedNodes[nodeAddresses[i]].ttl -= 1;
+                if(connectedNodes[nodeAddresses[i]].ttl <= 0) {
+                    connectedNodes[nodeAddresses[i]].valid = false;
+                }
+            }
+        }
         
     }
 }
