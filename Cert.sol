@@ -1,5 +1,73 @@
 pragma solidity ^0.4.0;
 
+contract Certificate {
+    address mNode;
+    
+    struct sNode {
+        address nodeAddress;
+        uint initialized;
+        string public_key;
+        bool pki_changed;
+        string cert;
+        bool valid;
+        uint ttl;
+    }
+    
+    mapping(address => sNode) connectedNodes;
+    address[] nodeAddresses;
+    
+    function Certificate () {
+        mNode = msg.sender;
+    }
+    
+    // Only master can add new nodes to the network
+    // Two days time is given to change password
+    function init(address newNode) {
+        if(mNode == msg.sender) {
+            connectedNodes[newNode].initialized = 1;
+            connectedNodes[newNode].valid = true;
+            connectedNodes[newNode].ttl = 2;
+            nodeAddresses.push(newNode);
+            return;
+        }
+        return;
+    }
+    
+    // The sNode sends public_key to the master
+    function send_pki(string pki) {
+        if(connectedNodes[msg.sender].valid == true) {
+            connectedNodes[msg.sender].public_key = pki;
+            connectedNodes[msg.sender].ttl = 30;
+            connectedNodes[msg.sender].pki_changed = true;
+        }
+    }
+    
+    // Master node sends a certificate to nodes
+    function send_cert(address Address, string cert) {
+        if(msg.sender == mNode) {
+            if(connectedNodes[Address].pki_changed) {
+               connectedNodes[Address].pki_changed = false;
+               connectedNodes[Address].cert = cert;
+            }
+            return;
+        }
+        return;
+    }
+    
+    // Get the PKI of the node
+    function get_pki(address Address) returns (string){
+        if(connectedNodes[Address].valid) {
+            return connectedNodes[Address].public_key;
+        }
+        return "INVALID";
+    }
+    
+    // Check and decrement TTL. Mark invalid for expired TTLs
+    function check_ttl() {
+        
+    }
+}
+
 library StringUtils {
     /// @dev Does a byte-by-byte lexicographical comparison of two strings.
     /// @return a negative number if `_a` is smaller, zero if they are equal
@@ -53,35 +121,5 @@ library StringUtils {
     		}
     		return -1;
     	}	
-    }
-}
-
-contract Certificate {
-    address mNode;
-    
-    struct sNode {
-        address nodeAddress;
-        uint initialized;
-        string password;
-        uint valid;
-    }
-    
-    mapping(address => sNode) connectedNodes;
-    
-    function Certificate () {
-        mNode = msg.sender;
-    }
-    
-    function init(address newNode, string password) {
-        if(mNode == msg.sender) {
-            connectedNodes[newNode].initialized = 1;
-            if(StringUtils.equal(connectedNodes[newNode].password,"00000000000000000000"))
-            {
-                connectedNodes[newNode].password = "Enter new password here";
-            }
-        }
-        else {
-            
-        }
     }
 }
