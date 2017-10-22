@@ -16,6 +16,16 @@ contract Certificate {
     mapping(address => sNode) connectedNodes;
     address[] nodeAddresses;
     
+    function getMasterNode() returns (address) {
+        return mNode;
+    }
+    
+    function getNodeDetails(address Address) returns (address, uint, string, bool, string, bool, uint) {
+        return (connectedNodes[Address].nodeAddress, connectedNodes[Address].initialized,
+        connectedNodes[Address].public_key, connectedNodes[Address].pki_changed, connectedNodes[Address].cert,
+        connectedNodes[Address].valid, connectedNodes[Address].ttl);
+    }
+    
     function Certificate () {
         mNode = msg.sender;
     }
@@ -24,6 +34,7 @@ contract Certificate {
     // Two days time is given to change password
     function init(address newNode) {
         if(mNode == msg.sender) {
+            connectedNodes[newNode].nodeAddress = newNode;
             connectedNodes[newNode].initialized = 1;
             connectedNodes[newNode].valid = true;
             connectedNodes[newNode].ttl = 2;
