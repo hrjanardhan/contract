@@ -32,16 +32,23 @@ contract Certificate {
     
     // Only master can add new nodes to the network
     // Two days time is given to change password
-    function init(address newNode) {
+    function init(address newNode) returns (string){
         if(mNode == msg.sender) {
             connectedNodes[newNode].nodeAddress = newNode;
             connectedNodes[newNode].initialized = 1;
             connectedNodes[newNode].valid = true;
             connectedNodes[newNode].ttl = 2;
             nodeAddresses.push(newNode);
-            return;
+            return "Node initialized";
         }
-        return;
+        return "Aborted";
+    }
+    
+    function isMaster() returns (string){
+        if(mNode == msg.sender) {
+            return "Master";
+        }
+        return "Puppets";
     }
     
     // The sNode sends public_key to the master
