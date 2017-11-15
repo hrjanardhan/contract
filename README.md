@@ -46,26 +46,26 @@ The application can be divided into two parts:
 The smart contract is deployed on the block chain. Miners run the smart contract to create transactions(update state of devices) and fetch device details.
 
 #### getMasterNode() returns (address)()
-Args: None
-Returns: Address of the master node on the network
+* Args: None
+* Returns: Address of the master node on the network
 
 #### init(address newNode) returns (string)()
-Args: Address of the new node to be initialized
-Returns: Address "Success" or "Failure" stuatus while trying to add a device to the network
+* Args: Address of the new node to be initialized
+* Returns: Address "Success" or "Failure" stuatus while trying to add a device to the network
 
 #### get_pki(address Address) returns (string)
-Args: Address of the node whose public key is required
-Returns: The public key of the node
+* Args: Address of the node whose public key is required
+* Returns: The public key of the node
 
 #### send_pki(string pki)
-Args: Public key to be stored on blockchain
-Returns: None
+* Args: Public key to be stored on blockchain
+* Returns: None
 
 #### send_cert(address Address, string cert)
-Args: Address to which the certificate is to be sent, certificate
-Returns: None
+* Args: Address to which the certificate is to be sent, certificate
+* Returns: None
 
 #### check_ttl()
-Args: None
-Returns: None
-Description: Decrements the time to live on the network for the nodes. If the ttl of nodes reach zero, they will be marked dirty and will be banned from the network.
+* Args: None
+* Returns: None
+* Description: Decrements the time to live on the network for the nodes. If the ttl of nodes reach zero, they will be marked dirty and will be banned from the network.
