@@ -3,17 +3,19 @@ pragma solidity ^0.4.0;
 contract Certificate {
     address mNode;
     
-    struct sNode {
+    struct Node {
         address nodeAddress;
-        uint initialized;
-        string public_key;
         bool pki_changed;
+        bool isMaster;
         string cert;
+        string public_key;
         bool valid;
         uint ttl;
+        uint initialized;
+        
     }
     
-    mapping(address => sNode) connectedNodes;
+    mapping(address => Node) connectedNodes;
     address[] nodeAddresses;
     
     function getMasterNode() returns (address) {
@@ -28,12 +30,26 @@ contract Certificate {
     
     function Certificate () {
         mNode = msg.sender;
+        connectedNodes[msg.sender].nodeAddress = msg.sender;
+        connectedNodes[msg.sender].valid = true;
     }
     
     // Only master can add new nodes to the network
     // Two days time is given to change password
     function init(address newNode) returns (string){
         if(mNode == msg.sender) {
+            connectedNodes[newNode].nodeAddress = newNode;
+            connectedNodes[newNode].initialized = 1;
+            connectedNodes[newNode].valid = true;
+            connectedNodes[newNode].ttl = 2;
+            nodeAddresses.push(newNode);
+            return "Node initialized";
+        }
+        return "Aborted";
+    }
+    
+    function init_master(address newNode) returns (string){
+        if(connectedNodes[msg.sender].isMaster == true) {
             connectedNodes[newNode].nodeAddress = newNode;
             connectedNodes[newNode].initialized = 1;
             connectedNodes[newNode].valid = true;
@@ -74,7 +90,7 @@ contract Certificate {
     
     // Get the PKI of the node
     function get_pki(address Address) returns (string){
-        if(connectedNodes[Address].valid) {
+        if(connectedNodes[msg.sender].valid) {
             return connectedNodes[Address].public_key;
         }
         return "INVALID";
