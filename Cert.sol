@@ -46,7 +46,7 @@ contract Certificate {
     // Only master can add new nodes to the network
     // Two days time is given to change password
     function init(address newNode) returns (string){
-        if(mNode == msg.sender) {
+        if(connectedNodes[msg.sender].isMaster == true) {
             connectedNodes[newNode].nodeAddress = newNode;
             connectedNodes[newNode].initialized = true;
             connectedNodes[newNode].valid = true;
@@ -61,6 +61,7 @@ contract Certificate {
         if(connectedNodes[msg.sender].isMaster == true) {
             connectedNodes[newNode].nodeAddress = newNode;
             connectedNodes[newNode].initialized = true;
+            connectedNodes[newNode].isMaster = true;
             connectedNodes[newNode].valid = true;
             connectedNodes[newNode].ttl = 2;
             nodeAddresses.push(newNode);
@@ -70,7 +71,7 @@ contract Certificate {
     }
     
     function isMaster() returns (string){
-        if(mNode == msg.sender) {
+        if(connectedNodes[msg.sender].isMaster == true) {
             return "Master";
         }
         return "Puppets";
@@ -87,7 +88,7 @@ contract Certificate {
     
     // Master node sends a certificate to nodes
     function send_cert(address Address, string cert) {
-        if(msg.sender == mNode) {
+        if(connectedNodes[msg.sender].isMaster == true) {
             if(connectedNodes[Address].pki_changed) {
                connectedNodes[Address].pki_changed = false;
                connectedNodes[Address].cert = cert;
@@ -107,7 +108,7 @@ contract Certificate {
     
     // Check and decrement TTL. Mark invalid for expired TTLs
     function check_ttl() {
-        for(uint i = 0; i < nodeAddresses.length; i++) {
+        for(uint i = 0; i < nodeAddresses.length && connectedNodes[msg.sender].isMaster == true; i++) {
             if(connectedNodes[nodeAddresses[i]].valid == true) {
                 connectedNodes[nodeAddresses[i]].ttl -= 1;
                 if(connectedNodes[nodeAddresses[i]].ttl <= 0) {
