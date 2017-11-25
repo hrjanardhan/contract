@@ -10,8 +10,9 @@ contract Certificate {
         string cert;
         string public_key;
         bool valid;
+        bool initialized;
         uint ttl;
-        uint initialized;
+        
         
     }
     
@@ -22,16 +23,24 @@ contract Certificate {
         return mNode;
     }
     
-    function getNodeDetails(address Address) returns (address, uint, string, bool, string, bool, uint) {
-        return (connectedNodes[Address].nodeAddress, connectedNodes[Address].initialized,
-        connectedNodes[Address].public_key, connectedNodes[Address].pki_changed, connectedNodes[Address].cert,
-        connectedNodes[Address].valid, connectedNodes[Address].ttl);
+    function getNodeDetails(address Address) returns (address, uint, bool, bool, bool, bool, string) {
+        // address, uint, uint, bool, bool, string
+        return (
+        connectedNodes[Address].nodeAddress, 
+        connectedNodes[Address].ttl,
+        connectedNodes[Address].initialized,
+        connectedNodes[Address].valid,
+        connectedNodes[Address].pki_changed,
+        connectedNodes[Address].isMaster,
+        connectedNodes[Address].public_key
+        );
     }
     
     function Certificate () {
         mNode = msg.sender;
         connectedNodes[msg.sender].nodeAddress = msg.sender;
         connectedNodes[msg.sender].valid = true;
+        connectedNodes[msg.sender].isMaster = true;
     }
     
     // Only master can add new nodes to the network
@@ -39,7 +48,7 @@ contract Certificate {
     function init(address newNode) returns (string){
         if(mNode == msg.sender) {
             connectedNodes[newNode].nodeAddress = newNode;
-            connectedNodes[newNode].initialized = 1;
+            connectedNodes[newNode].initialized = true;
             connectedNodes[newNode].valid = true;
             connectedNodes[newNode].ttl = 2;
             nodeAddresses.push(newNode);
@@ -51,7 +60,7 @@ contract Certificate {
     function init_master(address newNode) returns (string){
         if(connectedNodes[msg.sender].isMaster == true) {
             connectedNodes[newNode].nodeAddress = newNode;
-            connectedNodes[newNode].initialized = 1;
+            connectedNodes[newNode].initialized = true;
             connectedNodes[newNode].valid = true;
             connectedNodes[newNode].ttl = 2;
             nodeAddresses.push(newNode);
