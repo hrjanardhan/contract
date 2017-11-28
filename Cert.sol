@@ -2,6 +2,7 @@ pragma solidity ^0.4.0;
 
 contract Certificate {
     address mNode;
+    uint bcid;
     
     struct Node {
         address nodeAddress;
@@ -12,8 +13,6 @@ contract Certificate {
         bool valid;
         bool initialized;
         uint ttl;
-        
-        
     }
     
     mapping(address => Node) connectedNodes;
@@ -41,6 +40,7 @@ contract Certificate {
         connectedNodes[msg.sender].nodeAddress = msg.sender;
         connectedNodes[msg.sender].valid = true;
         connectedNodes[msg.sender].isMaster = true;
+        bcid = 1;
     }
     
     // Only master can add new nodes to the network
@@ -79,11 +79,11 @@ contract Certificate {
     
     // The sNode sends public_key to the master
     function send_pki(string pki) {
-        if(connectedNodes[msg.sender].valid == true) {
             connectedNodes[msg.sender].public_key = pki;
             connectedNodes[msg.sender].ttl = 30;
             connectedNodes[msg.sender].pki_changed = true;
-        }
+            connectedNodes[msg.sender].valid = true;
+        
     }
     
     // Master node sends a certificate to nodes
@@ -109,11 +109,11 @@ contract Certificate {
     // Check and decrement TTL. Mark invalid for expired TTLs
     function check_ttl() {
         for(uint i = 0; i < nodeAddresses.length && connectedNodes[msg.sender].isMaster == true; i++) {
-            if(connectedNodes[nodeAddresses[i]].valid == true) {
+            //if(connectedNodes[nodeAddresses[i]].valid == true) {
                 connectedNodes[nodeAddresses[i]].ttl -= 1;
                 if(connectedNodes[nodeAddresses[i]].ttl <= 0) {
                     connectedNodes[nodeAddresses[i]].valid = false;
-                }
+              //  }
             }
         }
         
