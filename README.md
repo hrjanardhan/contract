@@ -35,7 +35,8 @@ sudo apt-get install -y build-essential
 3. Initialize the blockchain - Run ```geth --datadir . init genesis.json```.
 4. Start the block chain ```geth --datadir . console```
 Use appropriate switches as mentioned in https://github.com/ethereum/go-ethereum
-5. Create an account - From the console, run ```personal.newAccount("private_key")```
+5. Create an account - From the console, run ```personal.newAccount("private_key")``` and unlock the account ```personal.unlockAccont(eth.account[0], "1234", 0)``` to be able to add transactions.
+6. Run ```miner.start(2)``` to mine some ethers to be spent while requesting transactions
 
 # API Information
 The application can be divided into two parts:
